@@ -38,6 +38,18 @@ def plot(slope,tmaster=None):
 	# placing the toolbar on the Tkinter window 
 	canvas.get_tk_widget().pack() 
 
+def plotall():
+	for i in range(len(tabs)):
+		plot(i,tabs[i])
+
+def BuildTabs():
+	plots=NplotsEntry.get()
+	for i in range(int(plots)):
+		tabs[i] = ttk.Frame(tabControl) 
+		tabControl.add(tabs[i], text ='Tab '+str(i)) 
+
+	tabControl.pack(expand = 1, fill ="both") 
+
 # the main Tkinter window 
 root = tk.Tk() 
 
@@ -48,22 +60,20 @@ tabControl = ttk.Notebook(root)
 # dimensions of the main window 
 root.geometry("500x500") 
 
-#tab setup
-tab1 = ttk.Frame(tabControl) 
-tab2 = ttk.Frame(tabControl) 
+tabs={}
 
-tabControl.add(tab1, text ='Tab 1') 
-tabControl.add(tab2, text ='Tab 2') 
+#tab setup
+maintab = ttk.Frame(tabControl) 
+tabControl.add(maintab, text ='Main') 
+plot_button1 = Button(maintab, command = lambda: plotall(), height = 2, width = 10, text = "Plot") 
+plot_button1.pack() 
+NplotsEntry= tk.Entry(maintab)
+BTabs = Button(maintab, command = lambda: BuildTabs(), height = 2, width = 10, text = "BuildTabs") 
+NplotsEntry.pack()
+BTabs.pack()
 tabControl.pack(expand = 1, fill ="both") 
 
-# button that displays the plot 
-plot_button1 = Button(tab1, command = lambda: plot(1,tab1), height = 2, width = 10, text = "Plot") 
-plot_button2 = Button(tab2, command = lambda: plot(2,tab2), height = 2, width = 10, text = "Plot") 
 
-# place the button 
-# in window 
-plot_button1.pack() 
-plot_button2.pack() 
 
 # run the gui 
 
