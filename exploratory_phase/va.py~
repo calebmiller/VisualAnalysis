@@ -1,0 +1,66 @@
+import sklearn.datasets # for iris
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import root_pandas as rp #if we want to save as root_ntuple
+import matplotlib
+from matplotlib import rc #for custom label formatting
+'''Make larger axes labels for plots for papers and such'''
+matplotlib.rcParams['text.usetex'] = False
+matplotlib.rcParams["figure.titlesize"] = 30
+plt.rc('legend', fontsize=18)
+plt.rc('xtick', labelsize=24)
+plt.rc('ytick', labelsize=24)
+plt.rc('axes', labelsize=26)
+plt.rc('axes', titlesize=26)
+
+class VisualAnalysis:
+    def __init__(self, zoom_column = 'sepal_length', zoom_min = None, zoom_max = None, save_dataframe = False):
+        ''' Default arguments are None which will return a grid of histograms with the original data
+        zoom_column defines the branch with which to zoom in
+        zoom_min defines the minimum cut value for the branch
+        zoom_max defines the maximum cut value for the branch'''
+        self.base_data = self.load_data()
+        self.plot_histograms(self.base_data) #plot histograms without cuts
+        self.zoomed_data = self.zoom(column = zoom_column, min_value = zoom_min, max_value = zoom_max)
+        if len(self.base_data) == len(self.zoomed_data): #don't plot zoomed histograms if we don't zoom in further
+            pass
+        else:
+            self.plot_histograms(self.zoomed_data)
+        if save_dataframe == True:
+            self.save_zoomed_data(df = self.zoomed_data, path = './', filename = zoom_column + '_' + str(zoom_min) + '_' + str(zoom_max))
+        
+    def load_data(self): #for now just use iris
+        data = sklearn.datasets.load_iris(return_X_y=True, as_frame=True)[0] #loads as pandas dataframe
+        data.columns = data.columns.str.replace(' ', '_') #replace spaces with underscores
+        data.columns = data.columns.str.replace("_\(cm\)", '') #remove (cm)
+        return data
+    def plot_histograms(self,data):
+        fig,ax = plt.subplots(2,2,figsize=(12,10))
+        axs = [ax[0,0],ax[0,1],ax[1,0],ax[1,1]]
+        for i in range(0,len(axs)):
+            axs[i].hist(data[data.columns[i]])
+            axs[i].set_xlabel(data.columns[i])
+            axs[i].grid()
+        plt.tight_layout()
+        if len(data) == len(self.base_data):
+            fig.suptitle('Original Data')
+        else:
+            fig.suptitle('Zoomed Data')
+        plt.subplots_adjust(top=0.85) #To make figure title clear
+        plt.show()
+    def zoom(self,column,min_value,max_value):
+        original_data = self.base_data
+        zoomed_data = original_data.copy() #not necessary for code to run, but avoids pandas warnings
+        if min_value == None:
+            min_value = original_data[column].min()
+        if max_value == None:
+            max_value = original_data[column].max()
+        zoomed_data = zoomed_data.loc[(zoomed_data[column] >= min_value) & (zoomed_data[column] <= max_value)]
+        zoomed_data['original_index'] = zoomed_data.index #store original index
+        zoomed_data.index = [i for i in range(0,len(zoomed_data))] #reindex for convenience
+        return zoomed_data
+    def save_zoomed_data(self, df, path, filename, filetype = 'root'): #Default filetype is 'root'.
+        df.to_root(path + filename+'.'+filetype, key='tree')
+        
+va = VisualAnalysis()
