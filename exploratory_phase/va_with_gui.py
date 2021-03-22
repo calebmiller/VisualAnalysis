@@ -10,7 +10,7 @@ import sklearn.datasets # for iris
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import root_pandas as rp #if we want to save as root_ntuple
+#import root_pandas as rp #if we want to save as root_ntuple
 from matplotlib import rc #for custom label formatting
 '''Make larger axes labels for plots for papers and such'''
 matplotlib.rcParams['text.usetex'] = False
