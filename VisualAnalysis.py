@@ -24,12 +24,11 @@ class VisualAnalysis:
 			return
 		self.base_data=df_collection[files[0]] #return only first df for now
 		return
-	def get_hist(self,col):
+
+	def get_hist(self,col): #currently returns a simple hist with no interactive setup
 		#return ax to plot
 		#set up callbacks.connect to LimitUpdater
-		ax=self.base_data.hist(column=self.base_data.columns[col], bins=12)		
-#		print(type(ax[0][0]))
-#		return
+		ax=self.base_data.hist(column=self.base_data.columns[col], bins=12)		#hist() seems to return nparray of [[axes]] so [0][0] is required to get at axes object
 		fig=ax[0][0].get_figure()
 		return fig	
 	def get_NCols(self):

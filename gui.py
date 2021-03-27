@@ -11,15 +11,16 @@ class Gui:
 		#wait for user file input and settings
 		#Buttons should call other functions for making other pages
 		self.root=master
-		self.tabControl=ttk.Notebook(master)
+		self.tabControl=ttk.Notebook(master)  #overarching object for holding tkinter frames
 		self.root.geometry("500x500")
-		self.tabs={}
-		self.VA =VisualAnalysis()
+		self.tabs={} #holder for each page
+		self.VA =VisualAnalysis() #makes data handler available to whole GUI
 
-		maintab=ttk.Frame(self.tabControl)
+		#setup landing page for app
+		maintab=ttk.Frame(self.tabControl)  
 		self.tabControl.add(maintab,text='Main')
 		
-		plot_button1 = Button(maintab, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #instead of plotall should call method which get's VA to draw
+		plot_button1 = Button(maintab, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #calls simple setup function to make one page per plot 
 		plot_button1.pack()
 #		self.NplotsEntry= tk.Entry(maintab)
 #		BTabs = Button(maintab, command = lambda: self.BuildTabs(), height = 2, width = 10, text = "BuildTabs") #should query VA for number of plots
@@ -27,7 +28,7 @@ class Gui:
 #		BTabs.pack()
 		self.tabControl.pack(expand = 1, fill ="both")
 
-	def Plot(self,col,tmaster=None): 
+	def Plot(self,col,tmaster=None):  #idea behind this function is to be given a column number and a frame to plot on, then ask VA for the histogram
 
 		# Get Fig fro VA
 		fig = self.VA.get_hist(col)
@@ -48,12 +49,13 @@ class Gui:
 		canvas.get_tk_widget().pack()
 
 	def Setup(self):
-		self.VA.load_data()
-		ncols=self.VA.get_NCols()
-		self.BuildTabs(ncols)
+		self.VA.load_data() #load in iris dataset
+		ncols=self.VA.get_NCols() 
+		self.BuildTabs(ncols) #Make one tab per page needed
 		for i in range(int(ncols)):
-			self.Plot(i,self.tabs[i])
-	def BuildTabs(self,ncols):
+			self.Plot(i,self.tabs[i]) #plot all variables
+
+	def BuildTabs(self,ncols): #currrently makes one figure per frame, eventually should call Page() for a more complex layout
 		for i in range(int(ncols)):
 			self.tabs[i] = ttk.Frame(self.tabControl)
 			self.tabControl.add(self.tabs[i], text ='Tab '+str(i))
