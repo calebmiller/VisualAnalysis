@@ -2,6 +2,8 @@ import tkinter as tk
 from VisualAnalysis import VisualAnalysis 
 from tkinter import ttk
 from tkinter import *
+import matplotlib
+matplotlib.use("Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
