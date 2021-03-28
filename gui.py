@@ -6,6 +6,16 @@ import matplotlib
 matplotlib.use("Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+class LimitUpdater:
+	def __init__(self,ph):
+		self.placeholder=ph
+	def update(self, ax):
+   		# Update the line
+		lims = ax.viewLim
+		xstart, xend = lims.intervalx
+		print(xstart)
+		print(xend)
+		ax.figure.canvas.draw_idle()
 
 class Gui:
 	def __init__(self, master):
@@ -29,6 +39,14 @@ class Gui:
 #		BTabs.pack()
 		self.tabControl.pack(expand = 1, fill ="both")
 
+	def test(self,ax):
+		lims = ax.viewLim
+		xstart, xend = lims.intervalx
+		w=ax.get_xlabel()
+		print(w)
+		print(xstart)
+		print(xend)
+#		ax.figure.canvas.draw_idle()
 	def Plot(self,col,tmaster=None): 
 
 		# Get Fig fro VA
@@ -39,6 +57,10 @@ class Gui:
 		canvas = FigureCanvasTkAgg(fig,tmaster)
 		canvas.draw()
 
+		ax=fig.get_axes()[0]
+		ax.set_xlabel(col)
+		ax.callbacks.connect('xlim_changed',self.test)	
+	
 		# placing the canvas on the Tkinter window
 		canvas.get_tk_widget().pack()
 	

@@ -30,5 +30,5 @@ limupdate=LimitUpdater(0)
 for x in range(len(df.columns)):
 	df.hist(column = df.columns[x], bins = 12, ax=ax[math.floor(x/2),x%2], figsize=(20, 18)) #axes numbering is set up to loop over (0,0 to 1,1). If pages for plots, page num = math.floor(x/4)
 	ax[math.floor(x/2),x%2].callbacks.connect('xlim_changed',limupdate.update) #checks new limits on plot, currently just prints
-	
+	print(ax[0][0])	
 plt.show()

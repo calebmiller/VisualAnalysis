@@ -28,7 +28,6 @@ class VisualAnalysis:
 		#return ax to plot
 		#set up callbacks.connect to LimitUpdater
 		ax=self.base_data.hist(column=self.base_data.columns[col], bins=12)		
-#		print(type(ax[0][0]))
 #		return
 		fig=ax[0][0].get_figure()
 		return fig	
