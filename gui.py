@@ -15,6 +15,8 @@ class Gui:
 		self.root=master
 		self.tabControl=ttk.Notebook(master)
 		self.root.geometry("700x700")
+		self.canvas = {}
+		self.toolbar = {}
 		self.tabs={}
 		self.VA =VisualAnalysis()
 
@@ -42,22 +44,25 @@ class Gui:
 
 		# creating the Tkinter canvas
 		# containing the Matplotlib figure
-		canvas = FigureCanvasTkAgg(fig,tmaster)
-		canvas.draw()
+		if col in self.canvas.keys(): #doesn't delete upon first initialization
+			self.canvas[col].get_tk_widget().destroy()
+			self.toolbar[col].destroy()
+		self.canvas[col] = FigureCanvasTkAgg(fig,tmaster)
+		self.canvas[col].draw()
 
 		ax=fig.get_axes()[0]
 		ax.set_xlabel(col)
 		ax.callbacks.connect('xlim_changed',self.UpdateLim)	
 	
 		# placing the canvas on the Tkinter window
-		canvas.get_tk_widget().pack()
+		self.canvas[col].get_tk_widget().pack()
 	
 		# creating the Matplotlib toolbar
-		toolbar = NavigationToolbar2Tk(canvas,tmaster)
-		toolbar.update()
+		self.toolbar[col] = NavigationToolbar2Tk(self.canvas[col],tmaster)
+		self.toolbar[col].update()
 
 		# placing the toolbar on the Tkinter window
-		canvas.get_tk_widget().pack()
+		self.canvas[col].get_tk_widget().pack()
 
 	def Setup(self):
 		self.VA.load_data()
