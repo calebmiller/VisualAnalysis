@@ -1,6 +1,7 @@
 import tkinter as tk
 from VisualAnalysis import VisualAnalysis 
 from tkinter import ttk
+from tkinter.filedialog import askopenfilename
 from tkinter import *
 import matplotlib
 matplotlib.use("Agg")
@@ -20,15 +21,32 @@ class Gui:
 
 		maintab=ttk.Frame(self.tabControl)
 		self.tabControl.add(maintab,text='Main')
-	
+
+			
+		fname = tk.Label(maintab, text='File')
+		tname = tk.Label(maintab, text='TTree')
+		file1 = tk.Entry(maintab)
+		tree1 = tk.Entry(maintab)
+		button1 = tk.Button(maintab,text="Browse",command= lambda: self.Browse(file1))
+
+		fname.grid(row=0,column=0)	
+		tname.grid(row=0,column=1)	
+		file1.grid(row=1,column=0)	
+		tree1.grid(row=1,column=1)
+		button1.grid(row=1,column=2)
+
 		plot_button1 = Button(maintab, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #instead of plotall should call method which get's VA to draw
-		plot_button1.pack()
+		plot_button1.grid(row=2,column=1)
 		#	self.NplotsEntry= tk.Entry(maintab)
 		#	BTabs = Button(maintab, command = lambda: self.BuildTabs(), height = 2, width = 10, text = "BuildTabs") #should query VA for number of plots
 		#	self.NplotsEntry.pack()
 		#	BTabs.pack()
 		self.tabControl.pack(expand = 1, fill ="both")
 
+	def Browse(self,file1):
+		filename = askopenfilename()
+		file1.delete(0,END) #clear any existing text
+		file1.insert(0,filename)
 	def UpdateLim(self,ax):
 		lims = ax.viewLim
 		xstart, xend = lims.intervalx
