@@ -1,4 +1,5 @@
 import tkinter as tk
+import uproot
 from VisualAnalysis import VisualAnalysis 
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
@@ -27,17 +28,22 @@ class Gui(tk.Frame):
 		self.tabControl.pack(expand = 1, fill ="both")
 	
 	def buildMainPage(self,parent):
-		flab = tk.Label(parent, text='File')
+		Trees=["none found"]
+		self.default=tk.StringVar(parent)
+		self.default.set("")
 		tlab = tk.Label(parent, text='TTree')
+		self.tree1 = tk.OptionMenu(parent, self.default, *Trees)
+		
+		flab = tk.Label(parent, text='File')
 		vcmd = (self.register(self.onValidate),'%P') #needed for the validation commands to stay active for widgets embedded in classes
 		file1 = tk.Entry(parent, validate="focusout", validatecommand=vcmd) #focusout checks contents when focus is moved away, checks for valid file
-		tree1 = tk.Entry(parent)
+
 		button1 = tk.Button(parent,text="Browse",command= lambda: self.Browse(file1))
 
 		flab.grid(row=0,column=0)	
 		tlab.grid(row=0,column=1)	
 		file1.grid(row=1,column=0)	
-		tree1.grid(row=1,column=1)
+		self.tree1.grid(row=1,column=1)
 		button1.grid(row=1,column=2)
 
 		plot_button1 = Button(parent, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #instead of plotall should call method which get's VA to draw
@@ -46,10 +52,19 @@ class Gui(tk.Frame):
 		#	BTabs = Button(parent, command = lambda: self.BuildTabs(), height = 2, width = 10, text = "BuildTabs") #should query VA for number of plots
 		#	self.NplotsEntry.pack()
 		#	BTabs.pack()
+	def UpdateMenu(self,tlist):
+		menu = self.tree1["menu"]
+		menu.delete(0, "end")
+		for string in tlist:
+			menu.add_command(label=string,command=lambda value=string: self.default.set(value))
 	def onValidate(self, P):
 		if(P.endswith('.root')):
 			if(path.isfile(P)):
-				print(P)
+				fin=uproot.open(P) #opens TFile
+				tlist=[]
+				for k in fin.keys():
+					tlist+=[k]
+				self.UpdateMenu(tlist)
 				return True
 			else:
 				print("file not found")
