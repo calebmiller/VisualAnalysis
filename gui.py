@@ -7,46 +7,61 @@ import matplotlib
 matplotlib.use("Agg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from os import path
 
-class Gui:
-	def __init__(self, master):
+class Gui(tk.Frame):
+	def __init__(self, parent):
 		#create landing page
 		#wait for user file input and settings
 		#Buttons should call other functions for making other pages
-		self.root=master
-		self.tabControl=ttk.Notebook(master)
+		tk.Frame.__init__(self, parent)
+		self.root=parent
+		self.tabControl=ttk.Notebook(parent)
 		self.root.geometry("700x700")
 		self.tabs={}
 		self.VA =VisualAnalysis()
 
 		maintab=ttk.Frame(self.tabControl)
 		self.tabControl.add(maintab,text='Main')
+		self.buildMainPage(maintab)		
+		self.tabControl.pack(expand = 1, fill ="both")
+	
+	def buildMainPage(self,parent):
+		flab = tk.Label(parent, text='File')
+		tlab = tk.Label(parent, text='TTree')
+		vcmd = (self.register(self.onValidate),'%P') #needed for the validation commands to stay active for widgets embedded in classes
+		file1 = tk.Entry(parent, validate="focusout", validatecommand=vcmd) #focusout checks contents when focus is moved away, checks for valid file
+		tree1 = tk.Entry(parent)
+		button1 = tk.Button(parent,text="Browse",command= lambda: self.Browse(file1))
 
-			
-		fname = tk.Label(maintab, text='File')
-		tname = tk.Label(maintab, text='TTree')
-		file1 = tk.Entry(maintab)
-		tree1 = tk.Entry(maintab)
-		button1 = tk.Button(maintab,text="Browse",command= lambda: self.Browse(file1))
-
-		fname.grid(row=0,column=0)	
-		tname.grid(row=0,column=1)	
+		flab.grid(row=0,column=0)	
+		tlab.grid(row=0,column=1)	
 		file1.grid(row=1,column=0)	
 		tree1.grid(row=1,column=1)
 		button1.grid(row=1,column=2)
 
-		plot_button1 = Button(maintab, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #instead of plotall should call method which get's VA to draw
+		plot_button1 = Button(parent, command = lambda: self.Setup(), height = 2, width = 10, text = "Plot") #instead of plotall should call method which get's VA to draw
 		plot_button1.grid(row=2,column=1)
-		#	self.NplotsEntry= tk.Entry(maintab)
-		#	BTabs = Button(maintab, command = lambda: self.BuildTabs(), height = 2, width = 10, text = "BuildTabs") #should query VA for number of plots
+		#	self.NplotsEntry= tk.Entry(parent)
+		#	BTabs = Button(parent, command = lambda: self.BuildTabs(), height = 2, width = 10, text = "BuildTabs") #should query VA for number of plots
 		#	self.NplotsEntry.pack()
 		#	BTabs.pack()
-		self.tabControl.pack(expand = 1, fill ="both")
-
+	def onValidate(self, P):
+		if(P.endswith('.root')):
+			if(path.isfile(P)):
+				print(P)
+				return True
+			else:
+				print("file not found")
+				return False
+		else:
+			print("file type not supported, .root required")
+			return False
 	def Browse(self,file1):
 		filename = askopenfilename()
 		file1.delete(0,END) #clear any existing text
 		file1.insert(0,filename)
+		self.onValidate(filename)
 	def UpdateLim(self,ax):
 		lims = ax.viewLim
 		xstart, xend = lims.intervalx
